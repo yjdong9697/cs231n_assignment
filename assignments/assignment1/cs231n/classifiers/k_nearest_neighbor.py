@@ -77,6 +77,8 @@ class KNearestNeighbor(object):
                 #####################################################################
                 # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
+                dists[i][j] = np.sqrt(np.sum(num_test[i] - num_train[j])) # numpy의 브로드캐스팅을 이용
+
                 pass
 
                 # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
