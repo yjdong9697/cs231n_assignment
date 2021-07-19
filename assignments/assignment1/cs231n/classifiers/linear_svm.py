@@ -12,9 +12,9 @@ def svm_loss_naive(W, X, y, reg):
     of N examples.
 
     Inputs:
-    - W: A numpy array of shape (D, C) containing weights.
-    - X: A numpy array of shape (N, D) containing a minibatch of data.
-    - y: A numpy array of shape (N,) containing training labels; y[i] = c means
+    - W: A numpy array of shape (D, C) containing weights. (3073 x 10)
+    - X: A numpy array of shape (N, D) containing a minibatch of data. (500, 3073)
+    - y: A numpy array of shape (N,) containing training labels; y[i] = c means (500)
       that X[i] has label c, where 0 <= c < C.
     - reg: (float) regularization strength
 
@@ -29,12 +29,14 @@ def svm_loss_naive(W, X, y, reg):
     num_train = X.shape[0]
     loss = 0.0
     for i in range(num_train):
-        scores = X[i].dot(W)
-        correct_class_score = scores[y[i]]
+        # Dot product를 함으로써 각 pixel에 대한 클래스의 가능성이 row vector로 튀어나오게 됨
+        scores = X[i].dot(W) # X[i] : i번째 input, W는 각 좌표별로 각 클래스에 대한 가중치가 저장 
+        correct_class_score = scores[y[i]] ## 정답 레이블에 대한 corrent score
         for j in range(num_classes):
             if j == y[i]:
                 continue
             margin = scores[j] - correct_class_score + 1  # note delta = 1
+            # 사실상 margin = max(0, scores[j] - corrent_class_score + 1)이랑 같은 소리
             if margin > 0:
                 loss += margin
 
