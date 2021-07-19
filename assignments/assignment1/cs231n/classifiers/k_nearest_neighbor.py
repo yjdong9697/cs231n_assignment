@@ -77,7 +77,7 @@ class KNearestNeighbor(object):
                 #####################################################################
                 # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-                dists[i][j] = np.sqrt(np.sum(num_test[i] - num_train[j])) # numpy의 브로드캐스팅을 이용
+                dists[i][j] = np.sqrt(np.sum((X[i,:] - self.X_train[j,:]) ** 2)) # numpy의 브로드캐스팅을 이용
 
                 pass
 
@@ -102,6 +102,7 @@ class KNearestNeighbor(object):
             # Do not use np.linalg.norm().                                        #
             #######################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+            dists[i] = np.sqrt(((self.X_train - X[i]) ** 2).sum(axis = 1)) # axis가 1이면 열방향이므로, 해당 방향으로 합치게 된다.
 
             pass
 
@@ -132,7 +133,9 @@ class KNearestNeighbor(object):
         #       and two broadcast sums.                                         #
         #########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
+        
+        # 브로드캐스팅의 위력을 느낄 수 있는 식 + reshape 처리해서 더하는 양상을 기억해둘 것
+        dists =  np.sqrt(- 2 * (X @ self.X_train.T) + np.sum(X ** 2, axis = 1).reshape(-1, 1) + np.sum(self.X_train ** 2, axis = 1).reshape(1, -1))
         pass
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
@@ -166,6 +169,9 @@ class KNearestNeighbor(object):
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
+            # test case에 대해서 거리가 제일 작은 것 k개의 인덱스를 구하고 이들의 라벨을 저장
+            closest_y = self.y_train[np.argsort(dists[i])[:k]]
+
             pass
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
@@ -177,6 +183,8 @@ class KNearestNeighbor(object):
             # label.                                                                #
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+
+            y_pred[i] = np.bincount(closest_y).argmax()
 
             pass
 
