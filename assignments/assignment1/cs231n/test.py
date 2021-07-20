@@ -1,5 +1,7 @@
 import numpy as np
 
-a = np.random.randn(10, 3)
+a = np.array([[1,0],
+             [0,1]])
 
-print(a)
+print(a == 1)
+

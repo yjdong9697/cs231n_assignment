@@ -23,14 +23,15 @@ def svm_loss_naive(W, X, y, reg):
     - gradient with respect to weights W; an array of same shape as W
     """
     dW = np.zeros(W.shape)  # initialize the gradient as zero
-
+    
     # compute the loss and the gradient
     num_classes = W.shape[1]
     num_train = X.shape[0]
+    dw_marginal = np.zeros((W.shape[0], W.shape[1]))
     loss = 0.0
     for i in range(num_train):
         # Dot product를 함으로써 각 pixel에 대한 클래스의 가능성이 row vector로 튀어나오게 됨
-        scores = X[i].dot(W) # X[i] : i번째 input, W는 각 좌표별로 각 클래스에 대한 가중치가 저장 
+        scores = X[i].dot(W) # X[i] : i번째 input, W는 각 좌표별로 각 클래스에 대한 가중치가 저장
         correct_class_score = scores[y[i]] ## 정답 레이블에 대한 corrent score
         for j in range(num_classes):
             if j == y[i]:
@@ -39,12 +40,17 @@ def svm_loss_naive(W, X, y, reg):
             # 사실상 margin = max(0, scores[j] - corrent_class_score + 1)이랑 같은 소리
             if margin > 0:
                 loss += margin
+                # numpy 배열의 경우, column vector 형태로 채우는 것도 가능하다.
+                dw_marginal[:, j] += X[i, :]
+                dw_marginal[:,y[i]] -= X[i, :]
 
     # Right now the loss is a sum over all training examples, but we want it
     # to be an average instead so we divide by num_train.
+    # num_train으로 전부 다 나누어주어서 총 num_train개의 input data들에 대한 loss값을 구함
     loss /= num_train
 
     # Add regularization to the loss.
+    # 규제(릿지)
     loss += reg * np.sum(W * W)
 
     #############################################################################
@@ -56,6 +62,8 @@ def svm_loss_naive(W, X, y, reg):
     # code above to compute the gradient.                                       #
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+
+    dW = dw_marginal / num_train + 2 * reg * W
 
     pass
 
@@ -70,6 +78,7 @@ def svm_loss_vectorized(W, X, y, reg):
 
     Inputs and outputs are the same as svm_loss_naive.
     """
+    num_train = X.shape[0]
     loss = 0.0
     dW = np.zeros(W.shape)  # initialize the gradient as zero
 
@@ -80,6 +89,18 @@ def svm_loss_vectorized(W, X, y, reg):
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
+    scores = X.dot(W)
+    correct_class_score = scores[np.arange(num_train), y]
+    one_store = (scores + 1 > correct_class_score.reshape(-1, 1)).astype(int)
+    one_store[np.arange(num_train), y] = 0
+
+    grad_store = one_store
+    grad_store[np.arange(num_train), y] -= np.sum(grad_store, axis = 1)
+    
+    loss = np.where(one_store == 1, scores + 1 - correct_class_score.reshape(-1, 1), 0)
+    loss = np.sum(loss)
+    loss /= num_train
+    loss += reg * np.sum(W * W)
     pass
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
@@ -94,6 +115,8 @@ def svm_loss_vectorized(W, X, y, reg):
     # loss.                                                                     #
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+
+    dW = np.dot(X.T, grad_store) / num_train + 2 * reg * W
 
     pass
 
