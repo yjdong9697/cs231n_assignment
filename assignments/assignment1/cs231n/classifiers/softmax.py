@@ -34,6 +34,25 @@ def softmax_loss_naive(W, X, y, reg):
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
+    score = X.dot(W)
+    score -= np.max(score, axis = 1).reshape(-1, 1) # Normalization trick
+    loss = 0
+    num_train = X.shape[0]
+    num_class = W.shape[1]
+    
+    for i in range(num_train):
+      exp = np.exp(score[i])
+      softmax = exp / np.sum(exp)
+      loss += -np.log(softmax[y[i]])
+      # 미분하면, W에 대해 미분하므로 일반적으로 X[i]는 대부분 그냥 따라온다.
+      for j in range(num_class):
+          dW[:, j] += X[i] * softmax[j] 
+      dW[:, y[i]] -= X[i]
+
+    loss /= num_train
+    dW /= num_train
+    loss += reg * np.sum(W * W)
+    dW += 2 * reg * W
     pass
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
@@ -58,6 +77,23 @@ def softmax_loss_vectorized(W, X, y, reg):
     # regularization!                                                           #
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+
+    score = X.dot(W)
+    score -= np.max(score, axis = 1).reshape(-1, 1) # Normalization trick
+    loss = 0
+    num_train = X.shape[0]
+
+    softmax = np.exp(score) / np.sum(np.exp(score), axis = 1).reshape(-1, 1)
+    loss = np.sum(-np.log(softmax[np.arange(num_train), y]))
+    # 정답 레이블에 대한 gradient 보정하기 위함
+    softmax[np.arange(num_train), y] -= 1
+    dW = np.dot(X.T, softmax)
+
+    # Normalization
+    loss /= num_train
+    dW /= num_train
+    loss += reg * np.sum(W * W)
+    dW += 2 * reg * W
 
     pass
 

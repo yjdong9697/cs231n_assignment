@@ -1,7 +1,5 @@
 import numpy as np
 
-a = np.array([[1,0],
-             [0,1]])
+a = np.array([True, True, False, True])
 
-print(a == 1)
-
+print(np.mean(a))
