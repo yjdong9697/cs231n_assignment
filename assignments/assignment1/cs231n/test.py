@@ -1,5 +1,4 @@
 import numpy as np
 
-a = np.array([True, True, False, True])
-
-print(np.mean(a))
+h1 = np.array([[2,3],[3,4]])
+print(*h1)

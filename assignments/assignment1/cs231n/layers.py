@@ -7,6 +7,7 @@ def affine_forward(x, w, b):
     """
     Computes the forward pass for an affine (fully-connected) layer.
 
+    # 3 * 32 * 32 = 3072로 쭉 나열한다는 의미로 이해하면 된다.
     The input x has shape (N, d_1, ..., d_k) and contains a minibatch of N
     examples, where each example x[i] has shape (d_1, ..., d_k). We will
     reshape each input into a vector of dimension D = d_1 * ... * d_k, and
@@ -14,7 +15,7 @@ def affine_forward(x, w, b):
 
     Inputs:
     - x: A numpy array containing input data, of shape (N, d_1, ..., d_k)
-    - w: A numpy array of weights, of shape (D, M)
+    - w: A numpy array of weights, of shape (D, M) # M은 일종의 class수라고 이해하면 될 듯
     - b: A numpy array of biases, of shape (M,)
 
     Returns a tuple of:
@@ -27,7 +28,8 @@ def affine_forward(x, w, b):
     # will need to reshape the input into rows.                               #
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
+    
+    out = np.dot(x.reshape(x.shape[0], -1), w) + b
     pass
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
@@ -60,6 +62,9 @@ def affine_backward(dout, cache):
     # TODO: Implement the affine backward pass.                               #
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+    dx = (np.dot(dout, w.T)).reshape(x.shape)
+    dw = np.dot(x.reshape(x.shape[0], -1).T, dout)
+    db = np.sum(dout, axis = 0)
 
     pass
 
@@ -86,6 +91,7 @@ def relu_forward(x):
     # TODO: Implement the ReLU forward pass.                                  #
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+    out = np.where(x > 0, x, 0)
 
     pass
 
